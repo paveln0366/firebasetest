@@ -1,6 +1,7 @@
 package com.pavelpotapov.firebasetest;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -12,7 +13,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -47,23 +50,40 @@ public class MainActivity extends AppCompatActivity {
 //                    }
 //                });
 
+//        db.collection("users")
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
+//                            QuerySnapshot querySnapshot = task.getResult();
+//                            if (querySnapshot == null) return;
+//                            for (QueryDocumentSnapshot documentSnapshot : querySnapshot) {
+//                                Map<String, Object> user = documentSnapshot.getData();
+//                                Log.i("firestore_test", user.get("first_name").toString());
+//                                Log.i("firestore_test", user.get("last_name").toString());
+//                                Log.i("firestore_test", user.get("age").toString());
+//                            }
+//                        } else {
+//                            Toast.makeText(MainActivity.this, "Error: " + task.getException(), Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                });
+
         db.collection("users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot == null) return;
-                            for (QueryDocumentSnapshot documentSnapshot : querySnapshot) {
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (value != null) {
+                            for (QueryDocumentSnapshot documentSnapshot : value) {
                                 Map<String, Object> user = documentSnapshot.getData();
                                 Log.i("firestore_test", user.get("first_name").toString());
                                 Log.i("firestore_test", user.get("last_name").toString());
                                 Log.i("firestore_test", user.get("age").toString());
                             }
                         } else {
-                            Toast.makeText(MainActivity.this, "Error: " + task.getException(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "value is null", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
